@@ -1,0 +1,27 @@
+{
+    "pages": {
+        "welcome": {
+            "title": "Antonino",
+            "subtitle": "il tuo aiutante in cucina",
+            "description": "Se non sai cosa cucinare, ti darà uno schiaffo d'ispirazione.",
+            "cta": "Sì, Chef! Cominciamo!"
+        },
+        "recipe-wizard": {}
+    },
+    "components": {
+        "AreaSearch": {
+            "title": "Regione",
+            "description": "Seleziona una regione per dare una base al tuo piatto.",
+            "searchPlaceholder": "Italiano o Giapponese?",
+            "loading": "Caricamento...",
+            "button": "Continua"
+        },
+        "CategorySearch": {
+            "title": "Categoria",
+            "description": "Seleziona una categoria per la tua ricetta.",
+            "searchPlaceholder": "Carne o Pesce? Forse meglio Pasta.",
+            "loading": "Caricamento...",
+            "button": "Continua"
+        }
+    }
+}

@@ -1,9 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/store/hooks';
-import { addFeedback, setRecommendation, updateSelection } from '@/lib/store/features/recipeSearchSlice';
-import { useGetRecipesByAreaQuery, useGetRecipeByIdQuery, useGetRecipesByCategoryQuery, useGetAreasQuery, useGetCategoriesQuery } from '@/lib/services/mealApi';
 import {
     Combobox,
     ComboboxInput,
@@ -26,78 +22,28 @@ import {
     FeedbackSection
 } from '@/components/core/RecipeCard';
 
-export default function RecipeRecommendation() {
+interface RecipeRecommendationProps {
+    selections: { area: string; category: string };
+    recommendation: any;
+    allAreas: any[];
+    allCategories: any[];
+    isLoading: boolean;
+    onSelectionChange: (type: 'area' | 'category', value: string) => void;
+    onFeedback: (status: 'Like' | 'Dislike') => void;
+    onNewIdea: () => void;
+}
+
+export default function RecipeRecommendation({
+    selections,
+    recommendation,
+    allAreas,
+    allCategories,
+    isLoading,
+    onSelectionChange,
+    onFeedback,
+    onNewIdea
+}: RecipeRecommendationProps) {
     const t = useTranslations('components.RecipeRecommendation');
-    const dispatch = useAppDispatch();
-
-    const selections = useAppSelector((state) => state.form.selections);
-    const recommendation = useAppSelector((state) => state.form.recommendation);
-
-    const { data: areaData, isFetching: isFetchingArea } = useGetRecipesByAreaQuery(selections.area, {
-        skip: !selections.area,
-    });
-    const { data: categoryData, isFetching: isFetchingCategory } = useGetRecipesByCategoryQuery(selections.category, {
-        skip: !selections.category,
-    });
-    const { data: allAreas } = useGetAreasQuery();
-    const { data: allCategories } = useGetCategoriesQuery();
-
-    const [randomMealId, setRandomMealId] = useState<string | null>(null);
-    const { data: recipeData, isFetching: isFetchingRecipe } = useGetRecipeByIdQuery(randomMealId as string, {
-        skip: !randomMealId,
-    });
-
-    const getIntersectedMeals = () => {
-        if (!areaData?.meals || !categoryData?.meals) return [];
-        const categoryIds = new Set(categoryData.meals.map((m: any) => m.idMeal));
-        return areaData.meals.filter((m: any) => categoryIds.has(m.idMeal));
-    };
-
-    const pickRandomMeal = (meals: any[]) => {
-        if (!meals || meals.length === 0) return;
-        const randomIndex = Math.floor(Math.random() * meals.length);
-        setRandomMealId(meals[randomIndex].idMeal);
-    };
-
-    useEffect(() => {
-        const intersectedMeals = getIntersectedMeals();
-        if (
-            intersectedMeals.length &&
-            !randomMealId &&
-            areaData &&
-            categoryData &&
-            !isFetchingArea &&
-            !isFetchingCategory
-        ) {
-            pickRandomMeal(intersectedMeals);
-        }
-    }, [areaData, categoryData, randomMealId, isFetchingArea, isFetchingCategory]);
-
-    useEffect(() => {
-        if (recipeData?.meals?.[0]) {
-            dispatch(setRecommendation(recipeData.meals[0] as any));
-        }
-    }, [recipeData, dispatch]);
-
-    const handleNewIdea = () => {
-        const intersectedMeals = getIntersectedMeals();
-        if (intersectedMeals.length > 1) {
-            pickRandomMeal(intersectedMeals);
-        }
-    };
-
-    const handleSelectionChange = (type: 'area' | 'category', value: string | null) => {
-        if (!value || selections[type] === value) return;
-        dispatch(updateSelection({ [type]: value }));
-        dispatch(setRecommendation(null));
-        setRandomMealId(null);
-    };
-
-    const handleFeedback = (status: 'Like' | 'Dislike') => {
-        dispatch(addFeedback(status));
-    };
-
-    const isLoading = isFetchingCategory || isFetchingArea || isFetchingRecipe || (!recommendation && !!randomMealId);
 
     const renderContent = () => {
         if (isLoading) return <LoadingState text={t('loading')} />;
@@ -115,13 +61,13 @@ export default function RecipeRecommendation() {
                         question={t('feedbackQuestion')}
                         yesText={t('yes')}
                         noText={t('no')}
-                        onFeedback={handleFeedback}
+                        onFeedback={onFeedback}
                     />
                 </CardContent>
 
                 <CardFooter className="bg-stone-50 border-t border-stone-100 p-4">
                     <button
-                        onClick={handleNewIdea}
+                        onClick={onNewIdea}
                         className="flex-1 py-4 bg-stone-200 text-[#2c1810] rounded-full font-bold flex items-center justify-center gap-2 transition-all hover:bg-stone-300"
                         disabled={isLoading}
                     >
@@ -149,9 +95,9 @@ export default function RecipeRecommendation() {
                     <div className="flex flex-col gap-2 flex-1">
                         <label className="text-sm font-medium text-stone-600">{t('area')}</label>
                         <Combobox
-                            items={allAreas?.meals?.map((a: any) => ({ value: a.strArea, label: a.strArea })) || []}
+                            items={allAreas?.map((a: any) => ({ value: a.strArea, label: a.strArea })) || []}
                             value={selections.area}
-                            onValueChange={(val) => handleSelectionChange('area', val)}
+                            onValueChange={(val) => val && onSelectionChange('area', val)}
                         >
                             <ComboboxInput placeholder={t('selectArea')} className="w-full" />
                             <ComboboxContent>
@@ -169,9 +115,9 @@ export default function RecipeRecommendation() {
                     <div className="flex flex-col gap-2 flex-1">
                         <label className="text-sm font-medium text-stone-600">{t('category')}</label>
                         <Combobox
-                            items={allCategories?.meals?.map((c: any) => ({ value: c.strCategory, label: c.strCategory })) || []}
+                            items={allCategories?.map((c: any) => ({ value: c.strCategory, label: c.strCategory })) || []}
                             value={selections.category}
-                            onValueChange={(val) => handleSelectionChange('category', val)}
+                            onValueChange={(val) => val && onSelectionChange('category', val)}
                         >
                             <ComboboxInput placeholder={t('selectCategory')} className="w-full" />
                             <ComboboxContent>

@@ -81,7 +81,16 @@ export default function RecipeRecommendation() {
 
     const handleNewIdea = () => {
         const intersectedMeals = getIntersectedMeals();
-        if (intersectedMeals.length) pickRandomMeal(intersectedMeals);
+        if (intersectedMeals.length > 1) {
+            pickRandomMeal(intersectedMeals);
+        }
+    };
+
+    const handleSelectionChange = (type: 'area' | 'category', value: string | null) => {
+        if (!value || selections[type] === value) return;
+        dispatch(updateSelection({ [type]: value }));
+        dispatch(setRecommendation(null));
+        setRandomMealId(null);
     };
 
     const handleFeedback = (status: 'Like' | 'Dislike') => {
@@ -142,13 +151,7 @@ export default function RecipeRecommendation() {
                         <Combobox
                             items={allAreas?.meals?.map((a: any) => ({ value: a.strArea, label: a.strArea })) || []}
                             value={selections.area}
-                            onValueChange={(val) => {
-                                if (val) {
-                                    dispatch(updateSelection({ area: val }));
-                                    dispatch(setRecommendation(null));
-                                    setRandomMealId(null);
-                                }
-                            }}
+                            onValueChange={(val) => handleSelectionChange('area', val)}
                         >
                             <ComboboxInput placeholder={t('selectArea')} className="w-full" />
                             <ComboboxContent>
@@ -168,13 +171,7 @@ export default function RecipeRecommendation() {
                         <Combobox
                             items={allCategories?.meals?.map((c: any) => ({ value: c.strCategory, label: c.strCategory })) || []}
                             value={selections.category}
-                            onValueChange={(val) => {
-                                if (val) {
-                                    dispatch(updateSelection({ category: val }));
-                                    dispatch(setRecommendation(null));
-                                    setRandomMealId(null);
-                                }
-                            }}
+                            onValueChange={(val) => handleSelectionChange('category', val)}
                         >
                             <ComboboxInput placeholder={t('selectCategory')} className="w-full" />
                             <ComboboxContent>

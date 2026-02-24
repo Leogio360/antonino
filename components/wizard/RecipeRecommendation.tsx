@@ -33,7 +33,6 @@ export default function RecipeRecommendation() {
     const selections = useAppSelector((state) => state.form.selections);
     const recommendation = useAppSelector((state) => state.form.recommendation);
 
-    // Queries
     const { data: areaData, isFetching: isFetchingArea } = useGetRecipesByAreaQuery(selections.area, {
         skip: !selections.area,
     });
@@ -48,10 +47,8 @@ export default function RecipeRecommendation() {
         skip: !randomMealId,
     });
 
-    // Helper: intersect area meals and category meals
     const getIntersectedMeals = () => {
         if (!areaData?.meals || !categoryData?.meals) return [];
-        // Map category meal IDs for O(1) lookup
         const categoryIds = new Set(categoryData.meals.map((m: any) => m.idMeal));
         return areaData.meals.filter((m: any) => categoryIds.has(m.idMeal));
     };
@@ -62,13 +59,19 @@ export default function RecipeRecommendation() {
         setRandomMealId(meals[randomIndex].idMeal);
     };
 
-    // Effects for random selection
     useEffect(() => {
         const intersectedMeals = getIntersectedMeals();
-        if (intersectedMeals.length && !randomMealId && areaData && categoryData) {
+        if (
+            intersectedMeals.length &&
+            !randomMealId &&
+            areaData &&
+            categoryData &&
+            !isFetchingArea &&
+            !isFetchingCategory
+        ) {
             pickRandomMeal(intersectedMeals);
         }
-    }, [areaData, categoryData, randomMealId]);
+    }, [areaData, categoryData, randomMealId, isFetchingArea, isFetchingCategory]);
 
     useEffect(() => {
         if (recipeData?.meals?.[0]) {
@@ -76,7 +79,6 @@ export default function RecipeRecommendation() {
         }
     }, [recipeData, dispatch]);
 
-    // Actions
     const handleNewIdea = () => {
         const intersectedMeals = getIntersectedMeals();
         if (intersectedMeals.length) pickRandomMeal(intersectedMeals);
@@ -133,7 +135,6 @@ export default function RecipeRecommendation() {
                 </p>
             </header>
 
-            {/* Always visible filters */}
             <Card className="overflow-hidden border-2 border-stone-100 shadow-sm rounded-2xl bg-white mb-6">
                 <CardContent className="pt-6 pb-6 px-6 space-y-4 md:space-y-0 md:flex md:gap-4">
                     <div className="flex flex-col gap-2 flex-1">
@@ -190,7 +191,6 @@ export default function RecipeRecommendation() {
                 </CardContent>
             </Card>
 
-            {/* Dynamic Results Content */}
             {renderContent()}
         </div>
     );

@@ -6,7 +6,22 @@
             "description": "Se non sai cosa cucinare, ti darà uno schiaffo d'ispirazione.",
             "cta": "Sì, Chef! Cominciamo!"
         },
-        "recipe-wizard": {}
+        "recipe-wizard": {
+            "back-button": "Indietro",
+            "next-button": "Avanti",
+            "restart-button": "Ricomincia",
+            "history-button": "Cronologia"
+        },
+        "history": {
+            "title": "La tua cronologia",
+            "subtitle": "Tutte le ricette che hai scoperto finora",
+            "empty": "Nessuna ricetta nella cronologia. Torna indietro e scopri nuove idee!",
+            "backToWizard": "Torna al menu",
+            "viewRecipe": "Visualizza ricetta",
+            "liked": "Mi piace",
+            "disliked": "Non mi piace",
+            "noImage": "Nessuna immagine disponibile"
+        }
     },
     "components": {
         "AreaSearch": {
@@ -22,6 +37,22 @@
             "searchPlaceholder": "Carne o Pesce? Forse meglio Pasta.",
             "loading": "Caricamento...",
             "button": "Continua"
+        },
+        "RecipeRecommendation": {
+            "title": "La tua ricetta!",
+            "description": "Abbiamo trovato il piatto perfetto per le tue preferenze.",
+            "noImage": "Nessuna immagine disponibile",
+            "viewRecipe": "Visualizza la ricetta completa",
+            "feedbackQuestion": "Questo piatto ti è piaciuto?",
+            "yes": "Sì",
+            "no": "No",
+            "newIdea": "Dammi un'altra idea",
+            "noRecommendation": "Nessuna ricetta trovata. Riprova.",
+            "loading": "Troviamo la ricetta perfetta per te...",
+            "area": "Regione",
+            "category": "Categoria",
+            "selectArea": "Seleziona una regione",
+            "selectCategory": "Seleziona una categoria"
         }
     }
 }

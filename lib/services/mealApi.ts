@@ -20,6 +20,13 @@ export const mealApi = createApi({
             query: () => 'list.php?c=list',
         }),
 
+        getRecipesByArea: builder.query<{ meals: Meal[] }, string>({
+            query: (area) => `filter.php?a=${area}`,
+            transformResponse: (response: { meals: Meal[] | null }) => ({
+                meals: response.meals ?? [],
+            }),
+        }),
+
         getRecipesByCategory: builder.query<{ meals: Meal[] }, string>({
             query: (category) => `filter.php?c=${category}`,
             transformResponse: (response: { meals: Meal[] | null }) => ({
@@ -36,6 +43,7 @@ export const mealApi = createApi({
 export const {
     useGetAreasQuery,
     useGetCategoriesQuery,
+    useGetRecipesByAreaQuery,
     useGetRecipesByCategoryQuery,
     useGetRecipeByIdQuery,
 } = mealApi;

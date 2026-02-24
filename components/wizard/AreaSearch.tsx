@@ -17,7 +17,7 @@ export default function AreaSearch() {
     const { data, isLoading } = useGetAreasQuery();
 
     const filteredAreas =
-        data?.meals?.filter((m) => m.strArea.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        data?.meals?.filter((m) => m.strArea.toLowerCase().includes(searchTerm.toLowerCase()) || m.strArea.toLowerCase() === selectedArea.toLowerCase()) ||
         [];
 
     return (

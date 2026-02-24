@@ -17,7 +17,7 @@ export default function CategorySearch() {
     const { data, isLoading } = useGetCategoriesQuery();
 
     const filteredCategories =
-        data?.meals?.filter((m) => m.strCategory.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        data?.meals?.filter((m) => m.strCategory.toLowerCase().includes(searchTerm.toLowerCase()) || m.strCategory.toLowerCase() === selectedCategory.toLowerCase()) ||
         [];
 
     return (

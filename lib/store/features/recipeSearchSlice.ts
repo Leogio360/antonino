@@ -56,6 +56,8 @@ const recipeSearchSlice = createSlice({
                     status: action.payload,
                     timestamp: Date.now(),
                 };
+
+                state.history = state.history.filter(item => item.idMeal !== newItem.idMeal);
                 state.history.unshift(newItem);
             }
         },

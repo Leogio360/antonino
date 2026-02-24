@@ -5,7 +5,7 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Recipe, HistoryItem } from '@/lib/store/features/recipeSearchSlice';
+import { Recipe, HistoryItem } from '@/types/recipe';
 
 export function LoadingState({ text }: { text: string }) {
     return (

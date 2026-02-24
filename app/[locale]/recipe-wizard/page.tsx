@@ -7,7 +7,7 @@ import { useTranslations } from 'next-intl';
 import { useAppDispatch } from '@/lib/store/hooks';
 import { nextStep, setStep, resetSearch, updateSelection, setRecommendation, addFeedback } from '@/lib/store/features/recipeSearchSlice';
 import { useGetAreasQuery, useGetCategoriesQuery, useGetRecipesByAreaQuery, useGetRecipesByCategoryQuery, useGetRecipeByIdQuery } from '@/lib/services/mealApi';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { RootState } from '@/lib/store/store';
 import AreaSearch from '@/components/wizard/AreaSearch';
 import CategorySearch from '@/components/wizard/CategorySearch';
@@ -17,6 +17,7 @@ export default function RecipeWizardPage() {
     const t = useTranslations('pages.recipe-wizard');
     const dispatch = useAppDispatch();
     const router = useRouter();
+    const searchParams = useSearchParams();
 
     const currentStep = useSelector((state: RootState) => state.form.step);
     const selections = useSelector((state: RootState) => state.form.selections);
@@ -64,6 +65,56 @@ export default function RecipeWizardPage() {
             pickRandomMeal(intersectedMeals);
         }
     }, [areaData, categoryData, randomMealId, isFetchingArea, isFetchingCategory]);
+
+    useEffect(() => {
+        const areaParam = searchParams.get('area') || '';
+        const categoryParam = searchParams.get('category') || '';
+        const recipeParam = searchParams.get('recipe') || '';
+
+        if (recipeParam) {
+            setRandomMealId(recipeParam);
+        }
+
+        if (areaParam || categoryParam) {
+            dispatch(updateSelection({
+                area: areaParam,
+                category: categoryParam
+            }));
+
+            if (areaParam && categoryParam) {
+                dispatch(setStep(3));
+            } else if (areaParam) {
+                dispatch(setStep(2));
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        const handlePopState = () => {
+            const params = new URLSearchParams(window.location.search);
+            const areaParam = params.get('area') || '';
+            const categoryParam = params.get('category') || '';
+            const recipeParam = params.get('recipe') || '';
+
+            dispatch(updateSelection({
+                area: areaParam,
+                category: categoryParam
+            }));
+
+            setRandomMealId(recipeParam || null);
+
+            if (areaParam && categoryParam) {
+                dispatch(setStep(3));
+            } else if (areaParam) {
+                dispatch(setStep(2));
+            } else {
+                dispatch(setStep(1));
+            }
+        };
+
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
+    }, [dispatch]);
 
     useEffect(() => {
         if (recipeData?.meals?.[0]) {

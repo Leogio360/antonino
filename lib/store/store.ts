@@ -1,6 +1,7 @@
 import { configureStore, Middleware } from '@reduxjs/toolkit';
 import { mealApi } from '@/lib/services/mealApi';
 import recipeSearchSlice from '@/lib/store/features/recipeSearchSlice';
+import { setUrlParam } from '@/lib/helpers/url';
 
 const localStorageMiddleware: Middleware = (storeAPI) => (next) => (action: any) => {
     const result = next(action);
@@ -13,6 +14,33 @@ const localStorageMiddleware: Middleware = (storeAPI) => (next) => (action: any)
     return result;
 };
 
+const urlSyncMiddleware: Middleware = (storeAPI) => (next) => (action: any) => {
+    const result = next(action);
+
+    const syncActions = ['recipeSearch/updateSelection', 'recipeSearch/resetSearch', 'recipeSearch/setRecommendation'];
+
+    if (syncActions.includes(action.type)) {
+        if (typeof window !== 'undefined') {
+            const state = storeAPI.getState() as any;
+            const selections = state.form.selections;
+            const recommendation = state.form.recommendation;
+
+            const url = new URL(window.location.href);
+            let hasChanges = false;
+
+            hasChanges = setUrlParam(url, 'area', selections.area) || hasChanges;
+            hasChanges = setUrlParam(url, 'category', selections.category) || hasChanges;
+            hasChanges = setUrlParam(url, 'recipe', recommendation?.idMeal || '') || hasChanges;
+
+            if (hasChanges) {
+                window.history.pushState({}, '', url.toString());
+            }
+        }
+    }
+
+    return result;
+};
+
 export const makeStore = () => {
     return configureStore({
         reducer: {
@@ -20,7 +48,7 @@ export const makeStore = () => {
             form: recipeSearchSlice,
         },
         middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat(mealApi.middleware, localStorageMiddleware),
+            getDefaultMiddleware().concat(mealApi.middleware, localStorageMiddleware, urlSyncMiddleware),
     });
 };
 
